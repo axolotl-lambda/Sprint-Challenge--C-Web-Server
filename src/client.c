@@ -54,8 +54,6 @@ urlinfo_t *parse_url(char *url)
   port = colon_pointer + 1;
   *colon_pointer = '\0';
 
-  printf("%s %s %s\n", url, path, port);
-
   urlinfo->hostname = url;
   urlinfo->path = path;
   urlinfo->port = port;
@@ -95,7 +93,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
     perror("send");
   }
 
-  return 0;
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -118,15 +116,17 @@ int main(int argc, char *argv[])
   */
 
   urlinfo_t *url_info = parse_url(argv[1]);
-  printf("%s %s\n", url_info->hostname, url_info->port);
 
   int fd = get_socket(url_info->hostname, url_info->port);
 
-  send_request(fd, url_info->hostname, url_info->port, url_info->path);
+  int response = send_request(fd, url_info->hostname, url_info->port, url_info->path);
 
-  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
+  if (response > 0)
   {
-    printf("%s", buf);
+    while ((numbytes = recv(fd, buf, BUFSIZE - 1, 0)) > 0)
+    {
+      printf("%s\n", buf);
+    }
   }
 
   return 0;
