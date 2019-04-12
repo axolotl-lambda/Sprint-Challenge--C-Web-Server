@@ -47,12 +47,28 @@ urlinfo_t *parse_url(char *url)
   */
 
   char *slash_pointer = strstr(url, "/");
-  path = slash_pointer + 1;
-  *slash_pointer = '\0';
+
+  if (slash_pointer)
+  {
+    port = slash_pointer + 1;
+    *slash_pointer = '\0';
+  }
+  else
+  {
+    path = "/";
+  }
 
   char *colon_pointer = strstr(url, ":");
-  port = colon_pointer + 1;
-  *colon_pointer = '\0';
+
+  if (colon_pointer)
+  {
+    port = colon_pointer + 1;
+    *colon_pointer = '\0';
+  }
+  else
+  {
+    port = "80";
+  }
 
   urlinfo->hostname = url;
   urlinfo->path = path;
@@ -116,6 +132,7 @@ int main(int argc, char *argv[])
   */
 
   urlinfo_t *url_info = parse_url(argv[1]);
+  printf("%s %s %s\n", url_info->hostname, url_info->port, url_info->path);
 
   int fd = get_socket(url_info->hostname, url_info->port);
 
