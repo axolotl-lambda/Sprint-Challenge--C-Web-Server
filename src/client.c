@@ -50,12 +50,12 @@ urlinfo_t *parse_url(char *url)
 
   if (slash_pointer)
   {
-    port = slash_pointer + 1;
+    path = slash_pointer + 1;
     *slash_pointer = '\0';
   }
   else
   {
-    path = "/";
+    path = "";
   }
 
   char *colon_pointer = strstr(url, ":");
@@ -95,7 +95,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   int request_length = sprintf(request, "GET /%s HTTP/1.1\n"
                                         "Host: %s:%s\n"
-                                        "Connection: close\n",
+                                        "Connection: close\n\n",
                                path,
                                hostname,
                                port);
@@ -137,6 +137,8 @@ int main(int argc, char *argv[])
   int fd = get_socket(url_info->hostname, url_info->port);
 
   int response = send_request(fd, url_info->hostname, url_info->port, url_info->path);
+
+  printf("Response: %d\n", response);
 
   if (response > 0)
   {
